@@ -101,7 +101,6 @@ public final class ResourceWorld {
         for (Player p : Bukkit.getOnlinePlayers()) msg.send(p, "reset-done");
         plugin.getLogger().info("Resource world has been reset");
         pregenerate();
-        purgeBlueMap();
     }
 
     private void create(Long seed) {
@@ -136,17 +135,6 @@ public final class ResourceWorld {
         Bukkit.dispatchCommand(console, "chunky world " + name());
         Bukkit.dispatchCommand(console, "chunky radius " + radius);
         Bukkit.dispatchCommand(console, "chunky start");
-    }
-
-    /** Стереть старые тайлы карты BlueMap — иначе на ней останется прошлый мир. */
-    private void purgeBlueMap() {
-        String mapId = plugin.getConfig().getString("bluemap.map-id", "");
-        if (mapId == null || mapId.isBlank()) return;
-        if (Bukkit.getPluginManager().getPlugin("BlueMap") == null) return;
-        var console = Bukkit.getConsoleSender();
-        // reload — BlueMap заново цепляется к пересозданной папке мира; purge — чистит тайлы, рендер пойдёт заново
-        Bukkit.dispatchCommand(console, "bluemap reload light");
-        Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.dispatchCommand(console, "bluemap purge " + mapId), 100L);
     }
 
     private void saveData() {

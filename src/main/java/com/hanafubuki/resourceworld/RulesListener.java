@@ -73,6 +73,6 @@ public final class RulesListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onMove(PlayerMoveEvent e) {
         if (!e.hasChangedBlock()) return;
-        plugin.portal().onEnter(e.getPlayer(), e.getTo());
+        plugin.portal().onMove(e.getPlayer());
     }
 }

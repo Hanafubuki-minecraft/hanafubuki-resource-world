@@ -8,14 +8,22 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
-/** Необязательный портал: вошёл в область — оказался в мире ресурсов. Для серверов без отдельной команды телепорта. */
+/**
+ * Портал в мир ресурсов, работающий как портал в Незер: стоишь в нём — экран качает, звучит гул,
+ * через charge-seconds телепорт. Вышел раньше — ничего не происходит.
+ * Область — любой параллелепипед: вертикальная арка или горизонтальный «пол».
+ */
 public final class Portal {
 
     public record Region(String world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
@@ -27,88 +35,32 @@ public final class Portal {
         }
     }
 
+    /** Игрок стоит в портале: когда начал и куда полетит (точку ищем заранее, пока качает). */
+    private record Charge(long startedAt, CompletableFuture<Location> target) {
+    }
+
     private final ResourceWorldPlugin plugin;
     private final Messages msg;
     private final Map<UUID, Location> pos1 = new ConcurrentHashMap<>();
     private final Map<UUID, Location> pos2 = new ConcurrentHashMap<>();
     private final Map<UUID, Long> cooldown = new ConcurrentHashMap<>();
-    private final Map<UUID, Boolean> busy = new ConcurrentHashMap<>();
+    private final Map<UUID, Charge> charging = new ConcurrentHashMap<>();
     private Region region;
-    private BukkitTask effectsTask;
-    private long effectTick;
+    private BukkitTask task;
+    private long tick;
 
     public Portal(ResourceWorldPlugin plugin, Messages msg) {
         this.plugin = plugin;
         this.msg = msg;
     }
 
+    // ---------- настройка ----------
+
     public void load(FileConfiguration c) {
         ConfigurationSection s = c.getConfigurationSection("portal.region");
         region = s == null || s.getString("world") == null ? null : new Region(
                 s.getString("world"), s.getInt("min-x"), s.getInt("min-y"), s.getInt("min-z"),
                 s.getInt("max-x"), s.getInt("max-y"), s.getInt("max-z"));
-    }
-
-    /** Визуал портала: лепестки сыплются сверху проёма, в самом проёме — розовая дымка, иногда звон. */
-    public void startEffects() {
-        if (effectsTask != null) effectsTask.cancel();
-        effectsTask = plugin.getServer().getScheduler().runTaskTimer(plugin, this::playEffects, 20L, 3L);
-    }
-
-    public void stopEffects() {
-        if (effectsTask != null) effectsTask.cancel();
-        effectsTask = null;
-    }
-
-    private void playEffects() {
-        effectTick += 3;
-        var c = plugin.getConfig();
-        if (!enabled() || !c.getBoolean("portal.effects.enabled", true)) return;
-        World w = plugin.getServer().getWorld(region.world());
-        if (w == null) return;
-
-        // проём в координатах мира: блоки min..max включительно → объём min..max+1
-        double x0 = region.minX(), y0 = region.minY(), z0 = region.minZ();
-        double dx = region.maxX() - region.minX() + 1, dy = region.maxY() - region.minY() + 1, dz = region.maxZ() - region.minZ() + 1;
-        Location center = new Location(w, x0 + dx / 2, y0 + dy / 2, z0 + dz / 2);
-
-        double view = c.getDouble("portal.effects.view-distance", 32);
-        boolean someoneNear = false;
-        for (Player p : w.getPlayers()) {
-            if (p.getLocation().distanceSquared(center) <= view * view) { someoneNear = true; break; }
-        }
-        if (!someoneNear) return;
-
-        ThreadLocalRandom r = ThreadLocalRandom.current();
-
-        if (c.getBoolean("portal.effects.petals", true)) {
-            int petals = (int) Math.max(1, Math.round(dx * dz * 0.9));
-            for (int i = 0; i < petals; i++) {
-                w.spawnParticle(Particle.CHERRY_LEAVES,
-                        x0 + r.nextDouble() * dx, y0 + dy - 0.1, z0 + r.nextDouble() * dz, 1, 0, 0, 0, 0);
-            }
-        }
-
-        if (c.getBoolean("portal.effects.veil", true)) {
-            Particle.DustOptions dust = new Particle.DustOptions(parseColor(c.getString("portal.effects.veil-color", "#F7A1C0")), 0.9f);
-            int points = (int) Math.max(2, Math.round(dx * dy * dz * 1.2));
-            for (int i = 0; i < points; i++) {
-                w.spawnParticle(Particle.DUST,
-                        x0 + r.nextDouble() * dx, y0 + r.nextDouble() * dy, z0 + r.nextDouble() * dz, 1, 0, 0, 0, 0, dust);
-            }
-        }
-
-        if (c.getBoolean("portal.effects.sound", true) && effectTick % 60 == 0 && r.nextInt(3) == 0) {
-            w.playSound(center, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.5f, 0.8f + r.nextFloat() * 0.4f);
-        }
-    }
-
-    private static Color parseColor(String hex) {
-        try {
-            return Color.fromRGB(Integer.parseInt(hex.replace("#", ""), 16));
-        } catch (Exception e) {
-            return Color.fromRGB(0xF7A1C0);
-        }
     }
 
     public boolean enabled() {
@@ -123,7 +75,6 @@ public final class Portal {
         (first ? pos1 : pos2).put(p.getUniqueId(), l);
     }
 
-    /** Сохранить область из pos1/pos2 в config.yml. */
     public boolean save(Player p) {
         Location a = pos1.get(p.getUniqueId()), b = pos2.get(p.getUniqueId());
         if (a == null || b == null || a.getWorld() == null || !a.getWorld().equals(b.getWorld())) return false;
@@ -135,7 +86,7 @@ public final class Portal {
         c.set("portal.region.max-x", Math.max(a.getBlockX(), b.getBlockX()));
         c.set("portal.region.max-y", Math.max(a.getBlockY(), b.getBlockY()));
         c.set("portal.region.max-z", Math.max(a.getBlockZ(), b.getBlockZ()));
-        c.set("portal.enabled", true); // задал область — значит, портал нужен
+        c.set("portal.enabled", true);
         plugin.saveConfig();
         load(c);
         return true;
@@ -152,39 +103,161 @@ public final class Portal {
         region = null;
     }
 
-    /** Вызывается из PlayerMoveEvent при смене блока. */
-    public void onEnter(Player p, Location to) {
-        if (!enabled() || !region.contains(to)) return;
+    // ---------- работа портала ----------
+
+    public void start() {
+        stop();
+        task = plugin.getServer().getScheduler().runTaskTimer(plugin, this::tick, 20L, 2L);
+    }
+
+    public void stop() {
+        if (task != null) task.cancel();
+        task = null;
+        for (UUID id : charging.keySet()) {
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null) cancelEffects(p);
+        }
+        charging.clear();
+    }
+
+    /** Ноги в области — или игрок стоит на ней (горизонтальный портал-пол). */
+    private boolean inside(Player p) {
+        if (region == null) return false;
+        Location feet = p.getLocation();
+        return region.contains(feet) || region.contains(feet.clone().subtract(0, 1, 0));
+    }
+
+    /** Из PlayerMoveEvent: зашёл в портал — начинаем «качать». */
+    public void onMove(Player p) {
+        if (!enabled()) return;
         UUID id = p.getUniqueId();
-        long now = System.currentTimeMillis();
+        if (charging.containsKey(id) || !inside(p)) return;
         long cd = plugin.getConfig().getLong("portal.cooldown-seconds", 5) * 1000L;
-        if (busy.containsKey(id) || now - cooldown.getOrDefault(id, 0L) < cd) return;
+        if (System.currentTimeMillis() - cooldown.getOrDefault(id, 0L) < cd) return;
 
         World rw = plugin.resourceWorld().world();
         if (rw == null) {
             msg.send(p, "world-missing");
-            cooldown.put(id, now);
+            cooldown.put(id, System.currentTimeMillis());
             return;
         }
-        busy.put(id, true);
-        msg.send(p, "teleport-searching");
         var c = plugin.getConfig();
-        SafeLocationFinder.find(rw, c.getInt("random-teleport.min-radius", 200),
-                c.getInt("random-teleport.radius", 3000), c.getInt("random-teleport.max-attempts", 12))
-                .whenComplete((loc, err) -> plugin.getServer().getScheduler().runTask(plugin, () -> {
-                    busy.remove(id);
-                    cooldown.put(id, System.currentTimeMillis());
-                    if (!p.isOnline()) return;
-                    if (loc == null) {
-                        msg.send(p, "teleport-failed");
-                        return;
-                    }
-                    p.getWorld().spawnParticle(Particle.CHERRY_LEAVES, p.getLocation().add(0, 1, 0), 60, 0.6, 1, 0.6, 0);
-                    p.teleportAsync(loc).thenRun(() -> {
-                        p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.2f);
-                        loc.getWorld().spawnParticle(Particle.CHERRY_LEAVES, loc.clone().add(0, 1, 0), 60, 0.6, 1, 0.6, 0);
-                        plugin.resourceWorld().sendCountdown(p);
-                    });
-                }));
+        CompletableFuture<Location> target = SafeLocationFinder.find(rw,
+                c.getInt("random-teleport.min-radius", 200), c.getInt("random-teleport.radius", 3000),
+                c.getInt("random-teleport.max-attempts", 12));
+        charging.put(id, new Charge(System.currentTimeMillis(), target));
+
+        int chargeTicks = chargeMillis() / 50;
+        p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, chargeTicks + 60, 0, true, false, false));
+        p.playSound(p, Sound.BLOCK_PORTAL_TRIGGER, 0.6f, 1.15f);
+    }
+
+    private int chargeMillis() {
+        return (int) Math.max(0, plugin.getConfig().getDouble("portal.charge-seconds", 4) * 1000);
+    }
+
+    private void tick() {
+        tick += 2;
+        long now = System.currentTimeMillis();
+        int charge = chargeMillis();
+
+        for (Iterator<Map.Entry<UUID, Charge>> it = charging.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<UUID, Charge> e = it.next();
+            Player p = plugin.getServer().getPlayer(e.getKey());
+            if (p == null || !p.isOnline()) {
+                it.remove();
+                continue;
+            }
+            if (!enabled() || !inside(p)) {          // вышел раньше времени — отмена
+                it.remove();
+                cancelEffects(p);
+                continue;
+            }
+            Location l = p.getLocation().add(0, 1, 0);
+            p.getWorld().spawnParticle(Particle.CHERRY_LEAVES, l, 3, 0.4, 0.8, 0.4, 0);
+
+            if (now - e.getValue().startedAt() < charge) continue;
+            CompletableFuture<Location> target = e.getValue().target();
+            if (!target.isDone()) continue;          // точка ещё ищется — ждём, качка продолжается
+
+            it.remove();
+            cooldown.put(p.getUniqueId(), now);
+            Location dest = target.getNow(null);
+            if (dest == null) {
+                cancelEffects(p);
+                msg.send(p, "teleport-failed");
+                continue;
+            }
+            p.getWorld().spawnParticle(Particle.CHERRY_LEAVES, l, 60, 0.6, 1, 0.6, 0);
+            p.teleportAsync(dest).thenRun(() -> {
+                p.stopSound(Sound.BLOCK_PORTAL_TRIGGER);
+                p.playSound(p, Sound.BLOCK_PORTAL_TRAVEL, 0.35f, 1.3f);
+                dest.getWorld().spawnParticle(Particle.CHERRY_LEAVES, dest.clone().add(0, 1, 0), 60, 0.6, 1, 0.6, 0);
+                plugin.resourceWorld().sendCountdown(p);
+            });
+        }
+
+        playAmbient();
+    }
+
+    private void cancelEffects(Player p) {
+        p.removePotionEffect(PotionEffectType.NAUSEA);
+        p.stopSound(Sound.BLOCK_PORTAL_TRIGGER);
+    }
+
+    // ---------- визуал ----------
+
+    /** Лепестки сыплются сверху проёма, в самом проёме — розовая дымка, иногда звон. */
+    private void playAmbient() {
+        if (tick % 4 != 0) return;
+        var c = plugin.getConfig();
+        if (!enabled() || !c.getBoolean("portal.effects.enabled", true)) return;
+        World w = plugin.getServer().getWorld(region.world());
+        if (w == null) return;
+
+        double x0 = region.minX(), y0 = region.minY(), z0 = region.minZ();
+        double dx = region.maxX() - region.minX() + 1, dy = region.maxY() - region.minY() + 1, dz = region.maxZ() - region.minZ() + 1;
+        Location center = new Location(w, x0 + dx / 2, y0 + dy / 2, z0 + dz / 2);
+
+        double view = c.getDouble("portal.effects.view-distance", 32);
+        boolean someoneNear = false;
+        for (Player p : w.getPlayers()) {
+            if (p.getLocation().distanceSquared(center) <= view * view) { someoneNear = true; break; }
+        }
+        if (!someoneNear) return;
+
+        ThreadLocalRandom r = ThreadLocalRandom.current();
+        boolean horizontal = dy == 1 && dx > 1 && dz > 1;
+
+        if (c.getBoolean("portal.effects.petals", true)) {
+            int petals = (int) Math.max(1, Math.round(dx * dz * (horizontal ? 0.4 : 0.9)));
+            double y = horizontal ? y0 + 1.6 : y0 + dy - 0.1;   // у пола-портала лепестки падают на него сверху
+            for (int i = 0; i < petals; i++) {
+                w.spawnParticle(Particle.CHERRY_LEAVES, x0 + r.nextDouble() * dx, y, z0 + r.nextDouble() * dz, 1, 0, 0, 0, 0);
+            }
+        }
+
+        if (c.getBoolean("portal.effects.veil", true)) {
+            Particle.DustOptions dust = new Particle.DustOptions(parseColor(c.getString("portal.effects.veil-color", "#F7A1C0")), 0.9f);
+            int points = (int) Math.max(2, Math.round(dx * dy * dz * 1.2));
+            double yOff = horizontal ? 1.0 : 0;                 // у пола-портала дымка стелется над поверхностью
+            double h = horizontal ? 0.35 : dy;
+            for (int i = 0; i < points; i++) {
+                w.spawnParticle(Particle.DUST, x0 + r.nextDouble() * dx, y0 + yOff + r.nextDouble() * h,
+                        z0 + r.nextDouble() * dz, 1, 0, 0, 0, 0, dust);
+            }
+        }
+
+        if (c.getBoolean("portal.effects.sound", true) && tick % 60 == 0 && r.nextInt(3) == 0) {
+            w.playSound(center, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.5f, 0.8f + r.nextFloat() * 0.4f);
+        }
+    }
+
+    private static Color parseColor(String hex) {
+        try {
+            return Color.fromRGB(Integer.parseInt(hex.replace("#", ""), 16));
+        } catch (Exception e) {
+            return Color.fromRGB(0xF7A1C0);
+        }
     }
 }

@@ -28,7 +28,7 @@ public final class ResourceWorldPlugin extends JavaPlugin {
         resourceWorld = new ResourceWorld(this, messages);
         portal = new Portal(this, messages);
         portal.load(getConfig());
-        portal.startEffects();
+        portal.start();
 
         resourceWorld.start();
         getServer().getPluginManager().registerEvents(new RulesListener(this, messages), this);
@@ -46,7 +46,7 @@ public final class ResourceWorldPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (portal != null) portal.stopEffects();
+        if (portal != null) portal.stop();
     }
 
     public ResourceWorld resourceWorld() {

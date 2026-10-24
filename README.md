@@ -22,10 +22,9 @@ English · [Русский](README.ru.md)
 - ⏰ **Personal reminders** — starting N days before the reset, every player sees how much time is left when they join; `/rwtime` any time
 - 🛏️ **Beds don't set respawn there** — so `/home`-by-bed setups keep pointing to the main world
 - 🚫 **Nether/End portals disabled** in the resource world — no shortcuts into the main Nether
-- 🌀 **Optional walk-in portal** — mark an area (e.g. an arch at spawn) and players step in to travel; cherry petals drift through the opening over a soft pink veil, with a quiet amethyst chime
+- 🌀 **Optional portal that works like a Nether portal** — stand in it and the screen starts to sway, after a few seconds you travel; step out earlier and nothing happens. Vertical (an arch) or horizontal (a floor). Cherry petals drift through it over a soft pink veil
 - 🎯 **Safe random landing** — async chunk loading, avoids water, lava and leaves
 - 🧱 **World border** and optional **Chunky** pregeneration after each reset
-- 🗺️ **BlueMap-aware** — after each reset the resource world's map is purged and re-rendered
 - 🌐 English by default, Russian built in, add your own language file
 
 ## How players get there
@@ -46,7 +45,7 @@ English · [Русский](README.ru.md)
 
 ## Setting up the portal
 
-1. Build an arch at spawn from any blocks.
+1. Build an arch (or a floor) at spawn from any blocks.
 2. Look at one corner of the inside and run `/rwadmin portal pos1`, then the opposite corner — `/rwadmin portal pos2`.
 3. `/rwadmin portal save` — the area is saved and the portal is enabled. Turn it off/on any time with `/rwadmin portal disable` / `enable`.
 
@@ -62,8 +61,6 @@ reset:
   interval-days: 30
   notify-before-days: 3
   pregenerate-with-chunky: false
-bluemap:
-  map-id: ""               # BlueMap map to purge after a reset
 random-teleport:
   min-radius: 200
   radius: 3000
@@ -73,6 +70,7 @@ rules:
   block-nether-portals: true
 portal:
   enabled: false
+  charge-seconds: 4          # stand in the portal this long to travel
   cooldown-seconds: 5
   effects:
     enabled: true

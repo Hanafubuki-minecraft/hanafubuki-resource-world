@@ -5,7 +5,7 @@ api-version: '1.21'
 author: ByteMe6
 website: https://github.com/Hanafubuki-minecraft/hanafubuki-resource-world
 description: A resource world that resets on schedule — with personal reset reminders and an optional portal
-softdepend: [Chunky, BlueMap]
+softdepend: [Chunky]
 
 commands:
   rwtime:

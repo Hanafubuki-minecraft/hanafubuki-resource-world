@@ -21,11 +21,6 @@ reset:
   # After a reset, pregenerate chunks with Chunky (if installed) up to random-teleport.radius
   pregenerate-with-chunky: false
 
-bluemap:
-  # ID of the BlueMap map for the resource world (file name in plugins/BlueMap/maps/ without .conf).
-  # After every reset its old tiles are purged so the map shows the new world. Empty = off.
-  map-id: ""
-
 random-teleport:
   # Players land at a random safe spot between min-radius and radius from the world spawn
   min-radius: 200
@@ -39,9 +34,11 @@ rules:
   block-nether-portals: true
 
 portal:
-  # Optional walk-in portal to the resource world (e.g. at spawn).
+  # Optional portal to the resource world (e.g. at spawn). Vertical (an arch) or horizontal (a floor) — any box works.
   # Set the area in-game: /rwadmin portal pos1, /rwadmin portal pos2, /rwadmin portal save
   enabled: false
+  # Stand in the portal this long to travel — like a Nether portal. Step out earlier and nothing happens.
+  charge-seconds: 4
   cooldown-seconds: 5
   effects:
     # Visuals inside the portal opening (shown only when a player is nearby)
