@@ -39,15 +39,16 @@ English · [Русский](README.ru.md)
 | `/rwtime` | Time left until the reset | `hanafubuki.rw.info` (everyone) |
 | `/rwadmin info` | World, next reset date, portal status | `hanafubuki.rw.admin` (op) |
 | `/rwadmin reset` | Reset now (asks for confirmation) | `hanafubuki.rw.admin` |
-| `/rwadmin portal pos1 \| pos2 \| save \| enable \| disable \| clear` | Set up the portal area | `hanafubuki.rw.admin` |
+| `/rwadmin portal detect \| pos1 \| pos2 \| save \| enable \| disable \| clear` | Set up the portal area | `hanafubuki.rw.admin` |
 | `/rwadmin language [code]` | Show or change the language | `hanafubuki.rw.admin` |
 | `/rwadmin reload` | Reload config and language files | `hanafubuki.rw.admin` |
 
 ## Setting up the portal
 
-1. Build an arch (or a floor) at spawn from any blocks.
-2. Look at one corner of the inside and run `/rwadmin portal pos1`, then the opposite corner — `/rwadmin portal pos2`.
-3. `/rwadmin portal save` — the area is saved and the portal is enabled. Turn it off/on any time with `/rwadmin portal disable` / `enable`.
+1. Build a frame (an arch) at spawn from any blocks — like a Nether portal frame, the opening must be closed on all sides.
+2. Stand inside the opening and run `/rwadmin portal detect` — the opening is found automatically, saved and enabled.
+
+For odd shapes or a horizontal (floor) portal, set the corners by hand: look at one inner corner — `/rwadmin portal pos1`, the opposite one — `/rwadmin portal pos2`, then `/rwadmin portal save`. Turn it off/on with `/rwadmin portal disable` / `enable`.
 
 ## Configuration
 

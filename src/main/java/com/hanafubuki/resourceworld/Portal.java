@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -12,7 +13,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -78,6 +82,59 @@ public final class Portal {
     public boolean save(Player p) {
         Location a = pos1.get(p.getUniqueId()), b = pos2.get(p.getUniqueId());
         if (a == null || b == null || a.getWorld() == null || !a.getWorld().equals(b.getWorld())) return false;
+        saveBox(a, b);
+        return true;
+    }
+
+    /**
+     * Найти проём рамки вокруг игрока, как игра находит рамку портала в Незер:
+     * заливка по проходимым блокам в двух вертикальных плоскостях; рамка — та плоскость, где заливка замкнута.
+     * Возвращает размер «ширина×высота» или null, если замкнутой рамки нет.
+     */
+    public String detect(Player p) {
+        Block start = p.getLocation().getBlock();
+        if (!start.isPassable()) return null;
+        int limit = 21 * 21;
+        Set<Block> best = null;
+        for (int axis : new int[]{0, 2}) {                 // 0: плоскость X-Y, 2: плоскость Z-Y
+            Set<Block> filled = fill(start, axis, limit);
+            if (filled != null && (best == null || filled.size() < best.size())) best = filled;
+        }
+        if (best == null) return null;
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (Block b : best) {
+            minX = Math.min(minX, b.getX()); minY = Math.min(minY, b.getY()); minZ = Math.min(minZ, b.getZ());
+            maxX = Math.max(maxX, b.getX()); maxY = Math.max(maxY, b.getY()); maxZ = Math.max(maxZ, b.getZ());
+        }
+        World w = start.getWorld();
+        saveBox(new Location(w, minX, minY, minZ), new Location(w, maxX, maxY, maxZ));
+        int width = Math.max(maxX - minX, maxZ - minZ) + 1;
+        return width + "×" + (maxY - minY + 1);
+    }
+
+    private static Set<Block> fill(Block start, int axis, int limit) {
+        Set<Block> seen = new HashSet<>();
+        ArrayDeque<Block> queue = new ArrayDeque<>();
+        queue.add(start);
+        seen.add(start);
+        int[][] dirs = axis == 0
+                ? new int[][]{{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}}
+                : new int[][]{{0, 0, 1}, {0, 0, -1}, {0, 1, 0}, {0, -1, 0}};
+        while (!queue.isEmpty()) {
+            Block b = queue.poll();
+            for (int[] d : dirs) {
+                Block n = b.getRelative(d[0], d[1], d[2]);
+                if (seen.contains(n) || !n.isPassable()) continue;
+                seen.add(n);
+                if (seen.size() > limit) return null;     // не замкнуто — это не рамка
+                queue.add(n);
+            }
+        }
+        return seen;
+    }
+
+    private void saveBox(Location a, Location b) {
         FileConfiguration c = plugin.getConfig();
         c.set("portal.region.world", a.getWorld().getName());
         c.set("portal.region.min-x", Math.min(a.getBlockX(), b.getBlockX()));
@@ -89,7 +146,6 @@ public final class Portal {
         c.set("portal.enabled", true);
         plugin.saveConfig();
         load(c);
-        return true;
     }
 
     public void setEnabled(boolean on) {

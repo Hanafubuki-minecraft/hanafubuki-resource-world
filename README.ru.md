@@ -34,15 +34,16 @@
 | `/rwtime` | Сколько осталось до сброса | `hanafubuki.rw.info` (все) |
 | `/rwadmin info` | Мир, дата сброса, состояние портала | `hanafubuki.rw.admin` (op) |
 | `/rwadmin reset` | Сбросить сейчас (с подтверждением) | `hanafubuki.rw.admin` |
-| `/rwadmin portal pos1 \| pos2 \| save \| enable \| disable \| clear` | Настроить область портала | `hanafubuki.rw.admin` |
+| `/rwadmin portal detect \| pos1 \| pos2 \| save \| enable \| disable \| clear` | Настроить область портала | `hanafubuki.rw.admin` |
 | `/rwadmin language [код]` | Показать или сменить язык | `hanafubuki.rw.admin` |
 | `/rwadmin reload` | Перезагрузить конфиг и языки | `hanafubuki.rw.admin` |
 
 ## Настройка портала
 
-1. Построй арку (или пол-портал) на спавне из любых блоков.
-2. Посмотри на один угол внутри и выполни `/rwadmin portal pos1`, затем на противоположный угол — `/rwadmin portal pos2`.
-3. Выполни `/rwadmin portal save`: область сохранится, и портал сразу включится. Выключить или включить обратно: `/rwadmin portal disable` / `enable`.
+1. Построй рамку (арку) на спавне из любых блоков. Как у портала в Незер, проём должен быть замкнут со всех сторон.
+2. Встань внутрь проёма и выполни `/rwadmin portal detect`: проём найдётся сам, сохранится и включится.
+
+Для необычной формы или горизонтального портала-пола углы задаются вручную: смотришь на один внутренний угол и выполняешь `/rwadmin portal pos1`, на противоположный — `/rwadmin portal pos2`, затем `/rwadmin portal save`. Выключить или включить: `/rwadmin portal disable` / `enable`.
 
 Конфиг с комментариями создаётся при первом запуске (`plugins/HanafubukiResourceWorld/config.yml`).
 

@@ -1,7 +1,6 @@
 package com.hanafubuki.resourceworld;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -74,9 +73,17 @@ public final class AdminCommand implements TabExecutor {
         }
         String action = a.length < 2 ? "" : a[1].toLowerCase(Locale.ROOT);
         switch (action) {
+            case "detect" -> {
+                String size = plugin.portal().detect(p);
+                if (size == null) msg.send(s, "portal-detect-failed");
+                else msg.send(s, "portal-detected", ph("size", size));
+            }
             case "pos1", "pos2" -> {
-                Block b = p.getTargetBlockExact(6);
-                Location l = b != null ? b.getLocation() : p.getLocation().getBlock().getLocation();
+                // клетка перед гранью, на которую смотришь — то есть внутри проёма, а не рама за ним
+                var hit = p.rayTraceBlocks(6);
+                Location l = hit != null && hit.getHitBlock() != null && hit.getHitBlockFace() != null
+                        ? hit.getHitBlock().getRelative(hit.getHitBlockFace()).getLocation()
+                        : p.getLocation().getBlock().getLocation();
                 plugin.portal().setPos(p, action.equals("pos1"), l);
                 msg.send(s, "portal-pos-set", ph("pos", action),
                         ph("xyz", l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ()));
@@ -109,7 +116,7 @@ public final class AdminCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender s, Command cmd, String label, String[] a) {
         if (a.length == 1) return filter(List.of("info", "reset", "portal", "language", "reload"), a[0]);
-        if (a.length == 2 && a[0].equalsIgnoreCase("portal")) return filter(List.of("pos1", "pos2", "save", "enable", "disable", "clear"), a[1]);
+        if (a.length == 2 && a[0].equalsIgnoreCase("portal")) return filter(List.of("detect", "pos1", "pos2", "save", "enable", "disable", "clear"), a[1]);
         if (a.length == 2 && (a[0].equalsIgnoreCase("language") || a[0].equalsIgnoreCase("lang"))) {
             return filter(plugin.availableLanguages(), a[1]);
         }
