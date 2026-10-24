@@ -25,6 +25,7 @@ English · [Русский](README.ru.md)
 - 🌀 **Optional walk-in portal** — mark an area (e.g. an arch at spawn) and players step in to travel; cherry petals drift through the opening over a soft pink veil, with a quiet amethyst chime
 - 🎯 **Safe random landing** — async chunk loading, avoids water, lava and leaves
 - 🧱 **World border** and optional **Chunky** pregeneration after each reset
+- 🗺️ **BlueMap-aware** — after each reset the resource world's map is purged and re-rendered
 - 🌐 English by default, Russian built in, add your own language file
 
 ## How players get there
@@ -61,6 +62,8 @@ reset:
   interval-days: 30
   notify-before-days: 3
   pregenerate-with-chunky: false
+bluemap:
+  map-id: ""               # BlueMap map to purge after a reset
 random-teleport:
   min-radius: 200
   radius: 3000

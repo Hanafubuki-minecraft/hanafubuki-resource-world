@@ -21,6 +21,11 @@ reset:
   # After a reset, pregenerate chunks with Chunky (if installed) up to random-teleport.radius
   pregenerate-with-chunky: false
 
+bluemap:
+  # ID of the BlueMap map for the resource world (file name in plugins/BlueMap/maps/ without .conf).
+  # After every reset its old tiles are purged so the map shows the new world. Empty = off.
+  map-id: ""
+
 random-teleport:
   # Players land at a random safe spot between min-radius and radius from the world spawn
   min-radius: 200
