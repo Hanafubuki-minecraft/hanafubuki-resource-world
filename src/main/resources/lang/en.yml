@@ -1,0 +1,39 @@
+# English messages for HanafubukiResourceWorld
+# Format: MiniMessage — https://docs.advntr.dev/minimessage/format.html
+prefix: "<gray>[<#ffb7c5>Resources</#ffb7c5>]</gray> "
+
+time-format: "<days>d <hours>h <minutes>m"
+
+players-only: "<red>Only players can use this command."
+no-permission: "<red>You don't have permission to do that."
+world-missing: "<red>The resource world isn't available right now."
+
+reset-countdown: "<gray>The resource world resets in <white><time></white>. Anything left there will be gone."
+reset-kicked: "<yellow>The resource world is being reset — you've been moved to spawn."
+reset-done: "<green>The resource world has been reset. Fresh land is waiting!"
+reset-confirm: "<yellow>This will wipe the resource world. Run <white>/<label> reset</white> again within 15 seconds to confirm."
+
+bed-blocked: "<yellow>Beds here don't set your respawn point — the resource world resets."
+portal-blocked: "<red>Nether and End portals don't work in the resource world."
+
+teleport-searching: "<gray>Looking for a safe spot…"
+teleport-failed: "<red>Couldn't find a safe spot. Try again."
+
+info: "<gray>World <white><world></white> · resets in <white><time></white> (<date>) · portal <white><portal>"
+usage-portal: "<red>Usage: <white>/<label> portal pos1 | pos2 | save | clear"
+portal-pos-set: "<green><pos> set to <white><xyz></white>."
+portal-saved: "<green>Portal area saved. Set <white>portal.enabled: true</white> in config.yml and run <white>/<label> reload</white>."
+portal-need-positions: "<red>Set pos1 and pos2 in the same world first."
+portal-cleared: "<green>Portal area removed."
+
+language-current: "<gray>Current language: <white><language></white>. Available: <white><available>"
+language-set: "<green>Language set to <white><language></white>."
+language-unknown: "<red>Unknown language <white><language></white>. Available: <white><available>"
+reloaded: "<green>Configuration reloaded."
+
+help-header: "<green>Resource world:"
+help-info: "<gray> /<label> info <dark_gray>—</dark_gray> world, next reset, portal"
+help-reset: "<gray> /<label> reset <dark_gray>—</dark_gray> reset the world now"
+help-portal: "<gray> /<label> portal pos1|pos2|save|clear <dark_gray>—</dark_gray> set up the portal"
+help-language: "<gray> /<label> language [code] <dark_gray>—</dark_gray> change language"
+help-reload: "<gray> /<label> reload <dark_gray>—</dark_gray> reload config"

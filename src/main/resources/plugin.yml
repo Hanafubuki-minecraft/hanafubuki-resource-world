@@ -1,0 +1,26 @@
+name: HanafubukiResourceWorld
+version: '${version}'
+main: com.hanafubuki.resourceworld.ResourceWorldPlugin
+api-version: '1.21'
+author: ByteMe6
+website: https://github.com/Hanafubuki-minecraft/hanafubuki-resource-world
+description: A resource world that resets on schedule — with personal reset reminders and an optional portal
+softdepend: [Chunky]
+
+commands:
+  rwtime:
+    description: Time left until the resource world resets
+    usage: /rwtime
+    permission: hanafubuki.rw.info
+  rwadmin:
+    description: Manage the resource world
+    usage: /rwadmin <info|reset|portal|language|reload>
+    permission: hanafubuki.rw.admin
+
+permissions:
+  hanafubuki.rw.info:
+    description: See when the resource world resets
+    default: true
+  hanafubuki.rw.admin:
+    description: Reset the world, set up the portal, change language, reload
+    default: op

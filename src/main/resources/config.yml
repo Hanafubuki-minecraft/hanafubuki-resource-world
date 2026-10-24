@@ -1,0 +1,40 @@
+# HanafubukiResourceWorld configuration
+# Apply changes with /rwadmin reload (world and reset settings apply on the next reset or restart)
+
+# Language: en, ru — or any file you add to plugins/HanafubukiResourceWorld/lang/
+# Can also be changed in-game: /rwadmin language <code>
+language: en
+
+world:
+  # Name of the resource world folder
+  name: resources
+  # NORMAL, NETHER or THE_END
+  environment: NORMAL
+  # World border size in blocks (0 = no border)
+  border-size: 8000
+
+reset:
+  # How often the world is wiped and regenerated with a new seed
+  interval-days: 30
+  # From this many days before the reset, every player sees a personal reminder when they join
+  notify-before-days: 3
+  # After a reset, pregenerate chunks with Chunky (if installed) up to random-teleport.radius
+  pregenerate-with-chunky: false
+
+random-teleport:
+  # Players land at a random safe spot between min-radius and radius from the world spawn
+  min-radius: 200
+  radius: 3000
+  max-attempts: 12
+
+rules:
+  # Beds and respawn anchors in the resource world don't set the respawn point
+  block-bed-spawn: true
+  # Nether/End portals don't work in the resource world
+  block-nether-portals: true
+
+portal:
+  # Optional walk-in portal to the resource world (e.g. at spawn).
+  # Set the area in-game: /rwadmin portal pos1, /rwadmin portal pos2, /rwadmin portal save
+  enabled: false
+  cooldown-seconds: 5

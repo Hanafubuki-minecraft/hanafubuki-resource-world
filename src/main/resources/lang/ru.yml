@@ -1,0 +1,39 @@
+# Русские сообщения HanafubukiResourceWorld
+# Формат: MiniMessage — https://docs.advntr.dev/minimessage/format.html
+prefix: "<gray>[<#ffb7c5>Ресурсы</#ffb7c5>]</gray> "
+
+time-format: "<days> д <hours> ч <minutes> мин"
+
+players-only: "<red>Эта команда только для игроков."
+no-permission: "<red>Недостаточно прав."
+world-missing: "<red>Мир ресурсов сейчас недоступен."
+
+reset-countdown: "<gray>Мир ресурсов обновится через <white><time></white>. Всё, что там останется, исчезнет."
+reset-kicked: "<yellow>Мир ресурсов обновляется — тебя перенесло на спавн."
+reset-done: "<green>Мир ресурсов обновлён. Новые земли ждут!"
+reset-confirm: "<yellow>Мир ресурсов будет стёрт. Повтори <white>/<label> reset</white> в течение 15 секунд для подтверждения."
+
+bed-blocked: "<yellow>Здесь кровать не сохраняет точку возрождения — мир ресурсов сбрасывается."
+portal-blocked: "<red>Порталы в Незер и Энд в мире ресурсов не работают."
+
+teleport-searching: "<gray>Ищем безопасное место…"
+teleport-failed: "<red>Не удалось найти безопасное место. Попробуй ещё раз."
+
+info: "<gray>Мир <white><world></white> · сброс через <white><time></white> (<date>) · портал <white><portal>"
+usage-portal: "<red>Использование: <white>/<label> portal pos1 | pos2 | save | clear"
+portal-pos-set: "<green><pos> установлен: <white><xyz></white>."
+portal-saved: "<green>Область портала сохранена. Поставь <white>portal.enabled: true</white> в config.yml и выполни <white>/<label> reload</white>."
+portal-need-positions: "<red>Сначала задай pos1 и pos2 в одном мире."
+portal-cleared: "<green>Область портала удалена."
+
+language-current: "<gray>Текущий язык: <white><language></white>. Доступны: <white><available>"
+language-set: "<green>Язык изменён на <white><language></white>."
+language-unknown: "<red>Неизвестный язык <white><language></white>. Доступны: <white><available>"
+reloaded: "<green>Конфигурация перезагружена."
+
+help-header: "<green>Мир ресурсов:"
+help-info: "<gray> /<label> info <dark_gray>—</dark_gray> мир, следующий сброс, портал"
+help-reset: "<gray> /<label> reset <dark_gray>—</dark_gray> сбросить мир сейчас"
+help-portal: "<gray> /<label> portal pos1|pos2|save|clear <dark_gray>—</dark_gray> настроить портал"
+help-language: "<gray> /<label> language [код] <dark_gray>—</dark_gray> сменить язык"
+help-reload: "<gray> /<label> reload <dark_gray>—</dark_gray> перезагрузить конфиг"
