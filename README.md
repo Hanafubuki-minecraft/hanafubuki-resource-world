@@ -39,7 +39,7 @@ English · [Русский](README.ru.md)
 | `/rwtime` | Time left until the reset | `hanafubuki.rw.info` (everyone) |
 | `/rwadmin info` | World, next reset date, portal status | `hanafubuki.rw.admin` (op) |
 | `/rwadmin reset` | Reset now (asks for confirmation) | `hanafubuki.rw.admin` |
-| `/rwadmin portal pos1 \| pos2 \| save \| clear` | Set up the portal area | `hanafubuki.rw.admin` |
+| `/rwadmin portal pos1 \| pos2 \| save \| enable \| disable \| clear` | Set up the portal area | `hanafubuki.rw.admin` |
 | `/rwadmin language [code]` | Show or change the language | `hanafubuki.rw.admin` |
 | `/rwadmin reload` | Reload config and language files | `hanafubuki.rw.admin` |
 
@@ -47,7 +47,7 @@ English · [Русский](README.ru.md)
 
 1. Build an arch at spawn from any blocks.
 2. Look at one corner of the inside and run `/rwadmin portal pos1`, then the opposite corner — `/rwadmin portal pos2`.
-3. `/rwadmin portal save`, set `portal.enabled: true` in `config.yml`, `/rwadmin reload`.
+3. `/rwadmin portal save` — the area is saved and the portal is enabled. Turn it off/on any time with `/rwadmin portal disable` / `enable`.
 
 ## Configuration
 

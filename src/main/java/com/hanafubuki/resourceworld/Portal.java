@@ -68,9 +68,15 @@ public final class Portal {
         c.set("portal.region.max-x", Math.max(a.getBlockX(), b.getBlockX()));
         c.set("portal.region.max-y", Math.max(a.getBlockY(), b.getBlockY()));
         c.set("portal.region.max-z", Math.max(a.getBlockZ(), b.getBlockZ()));
+        c.set("portal.enabled", true); // задал область — значит, портал нужен
         plugin.saveConfig();
         load(c);
         return true;
+    }
+
+    public void setEnabled(boolean on) {
+        plugin.getConfig().set("portal.enabled", on);
+        plugin.saveConfig();
     }
 
     public void clear() {

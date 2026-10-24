@@ -34,7 +34,7 @@
 | `/rwtime` | Сколько осталось до сброса | `hanafubuki.rw.info` (все) |
 | `/rwadmin info` | Мир, дата сброса, состояние портала | `hanafubuki.rw.admin` (op) |
 | `/rwadmin reset` | Сбросить сейчас (с подтверждением) | `hanafubuki.rw.admin` |
-| `/rwadmin portal pos1 \| pos2 \| save \| clear` | Настроить область портала | `hanafubuki.rw.admin` |
+| `/rwadmin portal pos1 \| pos2 \| save \| enable \| disable \| clear` | Настроить область портала | `hanafubuki.rw.admin` |
 | `/rwadmin language [код]` | Показать или сменить язык | `hanafubuki.rw.admin` |
 | `/rwadmin reload` | Перезагрузить конфиг и языки | `hanafubuki.rw.admin` |
 
@@ -42,7 +42,7 @@
 
 1. Построй арку на спавне из любых блоков.
 2. Посмотри на один угол внутри и выполни `/rwadmin portal pos1`, затем на противоположный угол — `/rwadmin portal pos2`.
-3. Выполни `/rwadmin portal save`, поставь `portal.enabled: true` в `config.yml` и выполни `/rwadmin reload`.
+3. Выполни `/rwadmin portal save`: область сохранится, и портал сразу включится. Выключить или включить обратно: `/rwadmin portal disable` / `enable`.
 
 Конфиг с комментариями создаётся при первом запуске (`plugins/HanafubukiResourceWorld/config.yml`).
 

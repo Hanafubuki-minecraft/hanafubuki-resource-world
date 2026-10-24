@@ -86,6 +86,15 @@ public final class AdminCommand implements TabExecutor {
                 plugin.portal().clear();
                 msg.send(s, "portal-cleared");
             }
+            case "enable", "disable" -> {
+                boolean on = action.equals("enable");
+                if (on && plugin.portal().region() == null) {
+                    msg.send(s, "portal-need-positions");
+                    return;
+                }
+                plugin.portal().setEnabled(on);
+                msg.send(s, on ? "portal-enabled" : "portal-disabled");
+            }
             default -> msg.send(s, "usage-portal", ph("label", label));
         }
     }
@@ -100,7 +109,7 @@ public final class AdminCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender s, Command cmd, String label, String[] a) {
         if (a.length == 1) return filter(List.of("info", "reset", "portal", "language", "reload"), a[0]);
-        if (a.length == 2 && a[0].equalsIgnoreCase("portal")) return filter(List.of("pos1", "pos2", "save", "clear"), a[1]);
+        if (a.length == 2 && a[0].equalsIgnoreCase("portal")) return filter(List.of("pos1", "pos2", "save", "enable", "disable", "clear"), a[1]);
         if (a.length == 2 && (a[0].equalsIgnoreCase("language") || a[0].equalsIgnoreCase("lang"))) {
             return filter(plugin.availableLanguages(), a[1]);
         }
