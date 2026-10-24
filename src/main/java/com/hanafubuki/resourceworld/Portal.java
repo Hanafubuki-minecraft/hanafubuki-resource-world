@@ -207,9 +207,11 @@ public final class Portal {
 
     // ---------- визуал ----------
 
-    /** Лепестки сыплются сверху проёма, в самом проёме — розовая дымка, иногда звон. */
+    /**
+     * Визуал: тонкая переливающаяся «плёнка» ровно в плоскости проёма, искорки по краю
+     * и редкие лепестки по всей высоте. Показывается, только если рядом кто-то есть.
+     */
     private void playAmbient() {
-        if (tick % 4 != 0) return;
         var c = plugin.getConfig();
         if (!enabled() || !c.getBoolean("portal.effects.enabled", true)) return;
         World w = plugin.getServer().getWorld(region.world());
@@ -227,30 +229,48 @@ public final class Portal {
         if (!someoneNear) return;
 
         ThreadLocalRandom r = ThreadLocalRandom.current();
-        boolean horizontal = dy == 1 && dx > 1 && dz > 1;
-
-        if (c.getBoolean("portal.effects.petals", true)) {
-            int petals = (int) Math.max(1, Math.round(dx * dz * (horizontal ? 0.4 : 0.9)));
-            double y = horizontal ? y0 + 1.6 : y0 + dy - 0.1;   // у пола-портала лепестки падают на него сверху
-            for (int i = 0; i < petals; i++) {
-                w.spawnParticle(Particle.CHERRY_LEAVES, x0 + r.nextDouble() * dx, y, z0 + r.nextDouble() * dz, 1, 0, 0, 0, 0);
-            }
-        }
+        // самая тонкая ось — это «толщина» портала; плёнка лежит посередине неё
+        int thin = dx <= dy && dx <= dz ? 0 : (dz <= dy ? 2 : 1);
 
         if (c.getBoolean("portal.effects.veil", true)) {
-            Particle.DustOptions dust = new Particle.DustOptions(parseColor(c.getString("portal.effects.veil-color", "#F7A1C0")), 0.9f);
-            int points = (int) Math.max(2, Math.round(dx * dy * dz * 1.2));
-            double yOff = horizontal ? 1.0 : 0;                 // у пола-портала дымка стелется над поверхностью
-            double h = horizontal ? 0.35 : dy;
+            Color from = parseColor(c.getString("portal.effects.veil-color", "#F7A1C0"));
+            Color to = parseColor(c.getString("portal.effects.veil-color-2", "#FFFFFF"));
+            Particle.DustTransition dust = new Particle.DustTransition(from, to, 0.7f);
+            double area = thin == 0 ? dy * dz : thin == 1 ? dx * dz : dx * dy;
+            int points = (int) Math.max(3, Math.round(area * c.getDouble("portal.effects.veil-density", 2.0)));
             for (int i = 0; i < points; i++) {
-                w.spawnParticle(Particle.DUST, x0 + r.nextDouble() * dx, y0 + yOff + r.nextDouble() * h,
-                        z0 + r.nextDouble() * dz, 1, 0, 0, 0, 0, dust);
+                double[] pt = pointOnPlane(r, thin, x0, y0, z0, dx, dy, dz, false);
+                w.spawnParticle(Particle.DUST_COLOR_TRANSITION, pt[0], pt[1], pt[2], 1, 0, 0, 0, 0, dust);
             }
         }
 
-        if (c.getBoolean("portal.effects.sound", true) && tick % 60 == 0 && r.nextInt(3) == 0) {
-            w.playSound(center, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.5f, 0.8f + r.nextFloat() * 0.4f);
+        if (c.getBoolean("portal.effects.sparkles", true) && r.nextInt(3) == 0) {
+            double[] pt = pointOnPlane(r, thin, x0, y0, z0, dx, dy, dz, true);
+            w.spawnParticle(Particle.WAX_OFF, pt[0], pt[1], pt[2], 1, 0, 0, 0, 0);
         }
+
+        if (c.getBoolean("portal.effects.petals", true) && r.nextInt(4) == 0) {
+            double[] pt = pointOnPlane(r, thin, x0, y0, z0, dx, dy, dz, false);
+            w.spawnParticle(Particle.CHERRY_LEAVES, pt[0], pt[1], pt[2], 1, 0, 0, 0, 0);
+        }
+
+        if (c.getBoolean("portal.effects.sound", true) && tick % 120 == 0 && r.nextInt(3) == 0) {
+            w.playSound(center, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.4f, 0.8f + r.nextFloat() * 0.4f);
+        }
+    }
+
+    /** Случайная точка в плоскости проёма (или на её краю — для искорок). */
+    private static double[] pointOnPlane(ThreadLocalRandom r, int thin, double x0, double y0, double z0,
+                                         double dx, double dy, double dz, boolean edge) {
+        double[] p = {x0 + r.nextDouble() * dx, y0 + r.nextDouble() * dy, z0 + r.nextDouble() * dz};
+        double[] o = {x0, y0, z0}, size = {dx, dy, dz};
+        p[thin] = o[thin] + size[thin] / 2 + (r.nextDouble() - 0.5) * 0.12;
+        if (edge) {
+            // прижать к одной из сторон проёма
+            int axis = thin == 0 ? (r.nextBoolean() ? 1 : 2) : thin == 1 ? (r.nextBoolean() ? 0 : 2) : (r.nextBoolean() ? 0 : 1);
+            p[axis] = o[axis] + (r.nextBoolean() ? 0.08 : size[axis] - 0.08);
+        }
+        return p;
     }
 
     private static Color parseColor(String hex) {

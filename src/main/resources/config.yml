@@ -43,11 +43,15 @@ portal:
   effects:
     # Visuals inside the portal opening (shown only when a player is nearby)
     enabled: true
-    # Cherry blossom petals drifting down through the opening
-    petals: true
-    # A soft shimmering veil that shows the opening is a portal
+    # A thin shimmering film right in the opening, fading from veil-color to veil-color-2
     veil: true
     veil-color: "#F7A1C0"
+    veil-color-2: "#FFFFFF"
+    veil-density: 2.0
+    # Tiny sparkles along the edge of the opening
+    sparkles: true
+    # An occasional cherry petal drifting through
+    petals: true
     # A quiet amethyst chime now and then
     sound: true
     view-distance: 32

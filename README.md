@@ -22,7 +22,7 @@ English · [Русский](README.ru.md)
 - ⏰ **Personal reminders** — starting N days before the reset, every player sees how much time is left when they join; `/rwtime` any time
 - 🛏️ **Beds don't set respawn there** — so `/home`-by-bed setups keep pointing to the main world
 - 🚫 **Nether/End portals disabled** in the resource world — no shortcuts into the main Nether
-- 🌀 **Optional portal that works like a Nether portal** — stand in it and the screen starts to sway, after a few seconds you travel; step out earlier and nothing happens. Vertical (an arch) or horizontal (a floor). Cherry petals drift through it over a soft pink veil
+- 🌀 **Optional portal that works like a Nether portal** — stand in it and the screen starts to sway, after a few seconds you travel; step out earlier and nothing happens. Vertical (an arch) or horizontal (a floor). A thin pink-to-white shimmering film fills the opening, with sparkles along the edge and an occasional cherry petal
 - 🎯 **Safe random landing** — async chunk loading, avoids water, lava and leaves
 - 🧱 **World border** and optional **Chunky** pregeneration after each reset
 - 🌐 English by default, Russian built in, add your own language file
@@ -74,9 +74,12 @@ portal:
   cooldown-seconds: 5
   effects:
     enabled: true
-    petals: true
     veil: true
     veil-color: "#F7A1C0"
+    veil-color-2: "#FFFFFF"
+    veil-density: 2.0
+    sparkles: true
+    petals: true
     sound: true
     view-distance: 32
 ```
