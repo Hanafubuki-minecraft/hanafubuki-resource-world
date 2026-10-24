@@ -177,17 +177,23 @@ public final class Portal {
     }
 
     /** Ноги в области — или игрок стоит на ней (горизонтальный портал-пол). */
-    private boolean inside(Player p) {
-        if (region == null) return false;
-        Location feet = p.getLocation();
+    private boolean inside(Location feet) {
+        if (region == null || feet == null) return false;
         return region.contains(feet) || region.contains(feet.clone().subtract(0, 1, 0));
     }
 
-    /** Из PlayerMoveEvent: зашёл в портал — начинаем «качать». */
-    public void onMove(Player p) {
+    private boolean inside(Player p) {
+        return inside(p.getLocation());
+    }
+
+    /**
+     * Из PlayerMoveEvent: зашёл в портал — начинаем «качать».
+     * Проверяем именно новую позицию (to): во время события p.getLocation() — ещё старая.
+     */
+    public void onMove(Player p, Location to) {
         if (!enabled()) return;
         UUID id = p.getUniqueId();
-        if (charging.containsKey(id) || !inside(p)) return;
+        if (charging.containsKey(id) || !inside(to)) return;
         long cd = plugin.getConfig().getLong("portal.cooldown-seconds", 5) * 1000L;
         if (System.currentTimeMillis() - cooldown.getOrDefault(id, 0L) < cd) return;
 
