@@ -22,7 +22,7 @@ English · [Русский](README.ru.md)
 - ⏰ **Personal reminders** — starting N days before the reset, every player sees how much time is left when they join; `/rwtime` any time
 - 🛏️ **Beds don't set respawn there** — so `/home`-by-bed setups keep pointing to the main world
 - 🚫 **Nether/End portals disabled** in the resource world — no shortcuts into the main Nether
-- 🌀 **Optional walk-in portal** — mark an area (e.g. an arch at spawn) and players step in to travel
+- 🌀 **Optional walk-in portal** — mark an area (e.g. an arch at spawn) and players step in to travel; cherry petals drift through the opening over a soft pink veil, with a quiet amethyst chime
 - 🎯 **Safe random landing** — async chunk loading, avoids water, lava and leaves
 - 🧱 **World border** and optional **Chunky** pregeneration after each reset
 - 🌐 English by default, Russian built in, add your own language file
@@ -71,6 +71,13 @@ rules:
 portal:
   enabled: false
   cooldown-seconds: 5
+  effects:
+    enabled: true
+    petals: true
+    veil: true
+    veil-color: "#F7A1C0"
+    sound: true
+    view-distance: 32
 ```
 
 > A reset unloads and deletes the world folder and generates a new one. It can freeze the server for a few seconds — if the reset date passes while the server is off, it happens on the next start, before anyone joins.

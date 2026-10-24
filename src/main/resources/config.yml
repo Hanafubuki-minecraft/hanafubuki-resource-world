@@ -38,3 +38,14 @@ portal:
   # Set the area in-game: /rwadmin portal pos1, /rwadmin portal pos2, /rwadmin portal save
   enabled: false
   cooldown-seconds: 5
+  effects:
+    # Visuals inside the portal opening (shown only when a player is nearby)
+    enabled: true
+    # Cherry blossom petals drifting down through the opening
+    petals: true
+    # A soft shimmering veil that shows the opening is a portal
+    veil: true
+    veil-color: "#F7A1C0"
+    # A quiet amethyst chime now and then
+    sound: true
+    view-distance: 32
