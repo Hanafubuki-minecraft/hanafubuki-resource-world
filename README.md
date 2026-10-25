@@ -98,3 +98,8 @@ Bump `version` in [`gradle.properties`](gradle.properties) and push to `main` �
 ## License
 
 [GNU General Public License v3.0](LICENSE) © ByteMe6
+
+## Commands and style
+
+- `config.yml` → `commands`: rename a command, change its aliases or disable it (restart to apply).
+- `config.yml` → `style`: message palette and prefix symbol. Language files use semantic tags — `<accent>`, `<text>`, `<muted>`, `<dim>`, `<success>`, `<error>`, `<gold>`, `<symbol>` — so recoloring everything is one edit. Default palette: [Hanafubuki style](https://github.com/Hanafubuki-minecraft/hanafubuki-brand/blob/main/STYLE.md).

@@ -1,6 +1,5 @@
 package com.hanafubuki.resourceworld;
 
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -34,14 +33,11 @@ public final class ResourceWorldPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new RulesListener(this, messages), this);
         getServer().getScheduler().runTaskTimer(this, resourceWorld::tick, 1200L, 1200L);
 
+        // имена, алиасы и включение — config.yml → commands
         AdminCommand admin = new AdminCommand(this, messages);
-        PluginCommand rwadmin = getCommand("rwadmin");
-        if (rwadmin != null) {
-            rwadmin.setExecutor(admin);
-            rwadmin.setTabCompleter(admin);
-        }
-        PluginCommand rwtime = getCommand("rwtime");
-        if (rwtime != null) rwtime.setExecutor(new InfoCommand(this, messages));
+        Commands.register(this, "rwadmin", "Manage the resource world", "hanafubuki.rw.admin", List.of(), admin, admin);
+        Commands.register(this, "rwtime", "Time left until the resource world resets", "hanafubuki.rw.info", List.of(),
+                new InfoCommand(this, messages), (s, c, l, a) -> List.of());
     }
 
     @Override

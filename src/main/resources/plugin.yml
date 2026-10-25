@@ -7,15 +7,7 @@ website: https://github.com/Hanafubuki-minecraft/hanafubuki-resource-world
 description: A resource world that resets on schedule — with personal reset reminders and an optional portal
 softdepend: [Chunky]
 
-commands:
-  rwtime:
-    description: Time left until the resource world resets
-    usage: /rwtime
-    permission: hanafubuki.rw.info
-  rwadmin:
-    description: Manage the resource world
-    usage: /rwadmin <info|reset|portal|language|reload>
-    permission: hanafubuki.rw.admin
+# Commands are registered from config.yml → commands (name, aliases, enabled)
 
 permissions:
   hanafubuki.rw.info:

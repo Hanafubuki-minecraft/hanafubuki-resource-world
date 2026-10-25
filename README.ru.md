@@ -56,3 +56,8 @@
 ## Лицензия
 
 [GNU General Public License v3.0](LICENSE) © ByteMe6
+
+## Команды и стиль
+
+- `config.yml` → `commands`: переименовать команду, поменять алиасы или выключить (после рестарта).
+- `config.yml` → `style`: палитра сообщений и символ префикса. Языковые файлы используют смысловые теги — `<accent>`, `<text>`, `<muted>`, `<dim>`, `<success>`, `<error>`, `<gold>`, `<symbol>` — поэтому перекрасить всё можно одной правкой. Палитра по умолчанию — [стиль Hanafubuki](https://github.com/Hanafubuki-minecraft/hanafubuki-brand/blob/main/STYLE.md).

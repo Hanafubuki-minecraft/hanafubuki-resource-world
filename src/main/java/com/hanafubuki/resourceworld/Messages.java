@@ -19,6 +19,7 @@ public final class Messages {
     private final MiniMessage mm = MiniMessage.miniMessage();
     private YamlConfiguration lang = new YamlConfiguration();
     private String code = "en";
+    private TagResolver style = Style.resolver(null);
 
     public Messages(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -45,6 +46,14 @@ public final class Messages {
 
         this.lang = loaded;
         this.code = c;
+        this.style = Style.resolver(plugin.getConfig().getConfigurationSection("style"));
+    }
+
+    private TagResolver[] withStyle(TagResolver[] r) {
+        TagResolver[] all = new TagResolver[r.length + 1];
+        all[0] = style;
+        System.arraycopy(r, 0, all, 1, r.length);
+        return all;
     }
 
     public String code() {
@@ -57,16 +66,16 @@ public final class Messages {
 
     /** Сообщение с префиксом. */
     public void send(CommandSender to, String key, TagResolver... placeholders) {
-        to.sendMessage(mm.deserialize(raw("prefix") + raw(key), placeholders));
+        to.sendMessage(mm.deserialize(raw("prefix") + raw(key), withStyle(placeholders)));
     }
 
     /** Строка без префикса (для списков и помощи). */
     public void line(CommandSender to, String key, TagResolver... placeholders) {
-        to.sendMessage(mm.deserialize(raw(key), placeholders));
+        to.sendMessage(mm.deserialize(raw(key), withStyle(placeholders)));
     }
 
     public Component component(String key, TagResolver... placeholders) {
-        return mm.deserialize(raw(key), placeholders);
+        return mm.deserialize(raw(key), withStyle(placeholders));
     }
 
     /** Плейсхолдер без разбора MiniMessage — пользовательский текст не может внедрить теги. */

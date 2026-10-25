@@ -55,3 +55,20 @@ portal:
     # A quiet amethyst chime now and then
     sound: true
     view-distance: 32
+
+# Commands: name, aliases, enabled. Restart the server to apply.
+commands:
+  rwtime:  { enabled: true, name: rwtime,  aliases: [] }
+  rwadmin: { enabled: true, name: rwadmin, aliases: [] }
+
+# Palette of all messages (MiniMessage tags in lang files: <accent> <text> <muted> <dim> <success> <error> <gold>, <symbol>)
+# Hanafubuki style: https://github.com/Hanafubuki-minecraft/hanafubuki-brand/blob/main/STYLE.md
+style:
+  symbol: "❀"
+  accent: "#F7A1C0"
+  text: "#F4EEF6"
+  muted: "#A99BB5"
+  dim: "#6F6480"
+  success: "#A8E6B5"
+  error: "#FF8A9B"
+  gold: "#FFCF6B"
