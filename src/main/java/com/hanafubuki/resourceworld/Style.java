@@ -21,8 +21,8 @@ public final class Style {
     static {
         DEFAULTS.put("accent", "#F7A1C0");
         DEFAULTS.put("text", "#F4EEF6");
-        DEFAULTS.put("muted", "#A99BB5");
-        DEFAULTS.put("dim", "#6F6480");
+        DEFAULTS.put("muted", "#C9BED3");
+        DEFAULTS.put("dim", "#9488A6");
         DEFAULTS.put("success", "#A8E6B5");
         DEFAULTS.put("error", "#FF8A9B");
         DEFAULTS.put("gold", "#FFCF6B");
