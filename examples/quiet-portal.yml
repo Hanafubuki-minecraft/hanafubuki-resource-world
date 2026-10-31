@@ -1,0 +1,9 @@
+# Применить: /rwadmin reload
+portal:
+  charge-seconds: 2
+  effects:
+    enabled: true
+    veil: true
+    sparkles: false
+    petals: false
+    sound: false

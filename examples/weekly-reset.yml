@@ -1,0 +1,10 @@
+# Мир и сброс применяются при следующем сбросе или рестарте. Остальное: /rwadmin reload
+world:
+  border-size: 4000
+reset:
+  interval-days: 7
+  notify-before-days: 1
+  pregenerate-with-chunky: true
+random-teleport:
+  min-radius: 100
+  radius: 1500

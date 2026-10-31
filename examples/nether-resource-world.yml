@@ -1,0 +1,8 @@
+# Применяется при следующем сбросе мира. Лучше — отдельным миром с другим именем.
+world:
+  name: resources_nether
+  environment: NETHER
+  border-size: 4000
+rules:
+  block-bed-spawn: true
+  block-nether-portals: true

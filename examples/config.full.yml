@@ -1,0 +1,74 @@
+# HanafubukiResourceWorld configuration
+# Apply changes with /rwadmin reload (world and reset settings apply on the next reset or restart)
+
+# Language: en, ru — or any file you add to plugins/HanafubukiResourceWorld/lang/
+# Can also be changed in-game: /rwadmin language <code>
+language: en
+
+world:
+  # Name of the resource world folder
+  name: resources
+  # NORMAL, NETHER or THE_END
+  environment: NORMAL
+  # World border size in blocks (0 = no border)
+  border-size: 8000
+
+reset:
+  # How often the world is wiped and regenerated with a new seed
+  interval-days: 30
+  # From this many days before the reset, every player sees a personal reminder when they join
+  notify-before-days: 3
+  # After a reset, pregenerate chunks with Chunky (if installed) up to random-teleport.radius
+  pregenerate-with-chunky: false
+
+random-teleport:
+  # Players land at a random safe spot between min-radius and radius from the world spawn
+  min-radius: 200
+  radius: 3000
+  max-attempts: 12
+
+rules:
+  # Beds and respawn anchors in the resource world don't set the respawn point
+  block-bed-spawn: true
+  # Nether/End portals don't work in the resource world
+  block-nether-portals: true
+
+portal:
+  # Optional portal to the resource world (e.g. at spawn). Vertical (an arch) or horizontal (a floor) — any box works.
+  # Set the area in-game: /rwadmin portal pos1, /rwadmin portal pos2, /rwadmin portal save
+  enabled: false
+  # Stand in the portal this long to travel — like a Nether portal. Step out earlier and nothing happens.
+  charge-seconds: 4
+  cooldown-seconds: 5
+  effects:
+    # Visuals inside the portal opening (shown only when a player is nearby)
+    enabled: true
+    # A thin shimmering film right in the opening, fading from veil-color to veil-color-2
+    veil: true
+    veil-color: "#F7A1C0"
+    veil-color-2: "#FFFFFF"
+    veil-density: 2.0
+    # Tiny sparkles along the edge of the opening
+    sparkles: true
+    # An occasional cherry petal drifting through
+    petals: true
+    # A quiet amethyst chime now and then
+    sound: true
+    view-distance: 32
+
+# Commands: name, aliases, enabled. Restart the server to apply.
+commands:
+  rwtime:  { enabled: true, name: rwtime,  aliases: [] }
+  rwadmin: { enabled: true, name: rwadmin, aliases: [] }
+
+# Palette of all messages (MiniMessage tags in lang files: <accent> <text> <muted> <dim> <success> <error> <gold>, <symbol>)
+# Hanafubuki style: https://github.com/Hanafubuki-minecraft/hanafubuki-brand/blob/main/STYLE.md
+style:
+  symbol: "❀"
+  accent: "#F7A1C0"
+  text: "#F4EEF6"
+  muted: "#C9BED3"
+  dim: "#9488A6"
+  success: "#A8E6B5"
+  error: "#FF8A9B"
+  gold: "#FFCF6B"
